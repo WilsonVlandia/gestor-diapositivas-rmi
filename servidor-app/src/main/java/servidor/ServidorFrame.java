@@ -29,7 +29,7 @@ public class ServidorFrame extends JFrame {
     private final GraphicsDevice dispositivoGrafico =
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
-    public ServidorFrame(File carpetaDiapositivas) {
+    public ServidorFrame(File carpetaDiapositivas, String ip) {
         super("Presentador - Servidor RMI");
         this.diapositivas = cargarDiapositivas(carpetaDiapositivas);
 
@@ -40,6 +40,14 @@ public class ServidorFrame extends JFrame {
         lblDiapositiva.setOpaque(true);
         lblDiapositiva.setForeground(Color.WHITE);
         add(lblDiapositiva, BorderLayout.CENTER);
+
+        // --- Aviso con la IP para los clientes (visible sin terminal) ---
+        JLabel lblIp = new JLabel("IP de este servidor para los clientes:  " + ip + ":1802/presentador",
+                SwingConstants.CENTER);
+        lblIp.setOpaque(true);
+        lblIp.setBackground(new Color(255, 249, 196));
+        lblIp.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        add(lblIp, BorderLayout.NORTH);
 
         // --- Controles locales del presentador ---
         JPanel panelControlesLocales = new JPanel();

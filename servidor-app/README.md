@@ -1,18 +1,21 @@
 # Servidor — Presentador (esta carpeta se queda en la máquina que proyecta)
 
 Esta carpeta (`servidor-app/`) corre en la máquina conectada al proyector /
-pantalla. Es un proyecto Maven autosuficiente: trae su propia copia de
-`common/` (en `src/main/java/common/`), el código en
-`src/main/java/servidor/` y las imágenes en `diapositivas/`. `mvn package`
-genera un `.jar` ejecutable en `target/servidor.jar`.
+pantalla. Trae un **`.jar` ya compilado** (`servidor.jar`) y las imágenes en
+`diapositivas/`; no hace falta compilar nada para usarlo. (El código fuente
+Maven está en `pom.xml` / `src/main/java/`, por si quieres modificarlo —
+ver el README de la raíz para regenerar el `.jar`.)
 
-## Requisito: JDK + Maven
-
-Esta máquina necesita un JDK (no solo un JRE: hace falta `javac`) y Maven
-(`mvn`). Si te falta alguno:
+## Requisito: Java (JRE)
 
 ```bash
-brew install openjdk maven
+java -version
+```
+
+Si no está instalado:
+
+```bash
+brew install openjdk
 ```
 
 ## Uso
@@ -20,24 +23,25 @@ brew install openjdk maven
 1. Pon tus imágenes (`.png`/`.jpg`/`.jpeg`/`.gif`, se ordenan
    alfabéticamente) dentro de `diapositivas/`, reemplazando las de ejemplo
    si quieres.
-2. Haz doble clic en **`Iniciar-Servidor.command`** (o corre `make servidor`
-   desde la raíz del proyecto).
-   - La primera vez, macOS puede avisar "no se puede verificar el
-     desarrollador": clic derecho → **Abrir** → **Abrir** otra vez.
+2. En una terminal dentro de esta carpeta:
+   ```bash
+   java -jar servidor.jar
+   ```
+   (o `java -jar servidor.jar otra-carpeta` para usar otra carpeta de
+   imágenes en vez de `diapositivas/`).
    - macOS puede preguntar "¿Permitir que java acepte conexiones
      entrantes?" — pulsa **Permitir** (si no, ningún cliente podrá
      conectarse).
-   - El script detecta tu JDK/Maven y tu IP de red, empaqueta el `.jar` con
-     Maven y abre la ventana del presentador.
-3. La terminal imprime algo como:
+3. Se abre la ventana del presentador. En la franja amarilla de arriba
+   aparece algo como:
    ```
-   IP de este servidor en la red: 192.168.1.23
-   En cada cliente, usa como 'Servidor':  192.168.1.23:1802/presentador
+   IP de este servidor para los clientes:  192.168.1.23:1802/presentador
    ```
-   Anota esa IP: el cliente la pide en un diálogo apenas arranca (ver
-   `cliente-app/README.md`).
-4. Se abre la ventana del presentador (diapositiva actual, botones locales,
-   log de actividad, panel de controles conectados).
+   Esa es la IP que el cliente pide en su diálogo apenas arranca (ver
+   `cliente-app/README.md`) — también queda registrada en el log de
+   actividad y en la consola.
+4. La ventana trae: diapositiva actual, botones locales, log de actividad y
+   panel de controles conectados.
 
 ## Flujo de aceptar/rechazar una conexión de un cliente
 
@@ -62,7 +66,8 @@ Este proyecto usa RMI directo (sin servidor intermedio), así que:
   aparte del de macOS, permite tráfico entre ambas IPs sin restringir
   puertos.
 - Si mueves de red (otro Wi-Fi) o reinicia el router y la IP cambia, vuelve
-  a arrancar `Iniciar-Servidor.command`: te mostrará la IP nueva.
+  a arrancar `java -jar servidor.jar`: la franja amarilla mostrará la IP
+  nueva.
 
 ## Notas de diseño
 

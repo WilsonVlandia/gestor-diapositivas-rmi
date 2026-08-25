@@ -10,73 +10,66 @@ cliente-app/    se copia a la OTRA máquina, la que va a controlar la
                 presentación a distancia
 ```
 
-Cada carpeta es un proyecto **Maven** completo por sí mismo (trae su propia
-copia de `common/`, las interfaces remotas compartidas), así que puedes
-copiar `cliente-app/` a otra máquina sin llevarte nada de `servidor-app/`, y
-viceversa. Cada uno empaqueta un `.jar` ejecutable (`target/servidor.jar` /
-`target/cliente.jar`) con el `Main-Class` ya puesto en el manifest.
+Cada carpeta trae un **`.jar` ejecutable ya compilado** (`servidor-app/servidor.jar`
+y `cliente-app/cliente.jar`): no hay que compilar nada ni instalar Maven para
+usarlos, solo tener Java instalado y correr `java -jar`.
 
-## Requisito en AMBAS máquinas: JDK + Maven
-
-Cada máquina compila y empaqueta su propio código al arrancar, así que
-necesita un JDK (no solo un JRE: hace falta `javac`) y Maven (`mvn`). Si
-faltan:
+## Requisito en AMBAS máquinas: Java (JRE)
 
 ```bash
-brew install openjdk maven
+java -version
 ```
 
-(los scripts de abajo también detectan automáticamente un OpenJDK/Maven
-instalados por Homebrew aunque no estén en el `PATH`).
+Si no está instalado:
+
+```bash
+brew install openjdk
+```
 
 ## Puesta en marcha rápida
 
 ### 1. Máquina del presentador (la del proyector)
 
-Deja la carpeta `servidor-app/` en esa máquina y haz doble clic en
-[`servidor-app/Iniciar-Servidor.command`](servidor-app/Iniciar-Servidor.command)
-(o, desde una terminal en la raíz del repo, `make servidor`).
-Compila y arranca solo; al final imprime la IP que hay que usar desde los
-clientes. Detalle completo en [`servidor-app/README.md`](servidor-app/README.md).
+Deja la carpeta `servidor-app/` en esa máquina y, en una terminal ahí dentro:
+
+```bash
+java -jar servidor.jar
+```
+
+(o `java -jar servidor.jar mis-diapositivas` para usar otra carpeta de
+imágenes en vez de `diapositivas/`). Se abre la ventana del presentador; en
+la franja amarilla de arriba muestra la IP que hay que darle a los clientes,
+por ejemplo `192.168.1.23:1802/presentador`. Detalle completo en
+[`servidor-app/README.md`](servidor-app/README.md).
 
 ### 2. Máquina(s) del control remoto
 
 Copia la carpeta `cliente-app/` a la otra máquina (USB, AirDrop, zip por
-correo/Drive...) y haz doble clic en
-[`cliente-app/Iniciar-Cliente.command`](cliente-app/Iniciar-Cliente.command)
-(o `make cliente` si tienes el repo completo en esa máquina). Apenas arranca,
-un diálogo te pide la IP del servidor (la que imprimió el paso 1); al
-aceptarla, el cliente solicita la conexión de inmediato — no hay que tocar
-ningún campo a mano. Detalle completo en [`cliente-app/README.md`](cliente-app/README.md).
-
-### Targets de `make` (opcional, si tienes el repo completo en una máquina)
+correo/Drive...) y, en una terminal ahí dentro:
 
 ```bash
-make servidor   # compila y arranca servidor-app/
-make cliente    # compila y arranca cliente-app/
+java -jar cliente.jar
 ```
 
-Son un atajo a los mismos `.command`; no reemplazan la necesidad de copiar
-`cliente-app/` a la otra máquina para el uso real en dos equipos.
+Apenas arranca, un diálogo pide la **IP del servidor** (la de la franja
+amarilla del paso 1). Al aceptarla, el cliente solicita la conexión de
+inmediato. Detalle completo en [`cliente-app/README.md`](cliente-app/README.md).
 
-Puedes repetir el paso 2 en varias máquinas (o varias veces en la misma)
+Puedes repetir este paso en varias máquinas (o varias veces en la misma)
 para simular varios controles conectados a la vez.
 
-### 3. Primera vez: permisos de macOS
+### 3. Primera vez: firewall de macOS
 
-- **Gatekeeper**: al hacer doble clic en el `.command` por primera vez,
-  macOS dirá que no puede verificar al desarrollador. Clic derecho sobre el
-  archivo → **Abrir** → confirmar **Abrir**. Solo hace falta una vez.
-- **Firewall**: macOS puede preguntar "¿Permitir que `java` acepte
-  conexiones entrantes?" tanto en el servidor como en el cliente — pulsa
-  **Permitir** en ambos casos, si no la conexión RMI no se completa.
+macOS puede preguntar "¿Permitir que `java` acepte conexiones entrantes?"
+tanto en el servidor como en el cliente — pulsa **Permitir** en ambos casos;
+si no, la conexión RMI no se completa.
 
 ### 4. Ambas máquinas en la misma red
 
 Este proyecto usa RMI directo entre las dos máquinas (sin servidor
 intermedio en internet), así que **ambas deben estar en la misma red local**
-(mismo Wi-Fi o LAN). Si cambias de red, vuelve a arrancar el servidor: te
-dará la IP nueva a usar en los clientes.
+(mismo Wi-Fi o LAN). Si cambias de red, vuelve a arrancar el servidor: la
+franja amarilla mostrará la IP nueva.
 
 ## Cómo funciona (para referencia / si quieres tocar el código)
 
@@ -85,36 +78,39 @@ Sigue el patrón de conexión RMI estándar (`iRMI` / `ImpRMI` /
 
 ```
 servidor-app/
-  pom.xml
-  src/main/java/common/    interfaces remotas compartidas (duplicadas en cliente-app/)
-  src/main/java/servidor/  presentador: ventana de diapositivas, log, panel de conexiones
-  diapositivas/             imágenes de la presentación
+  servidor.jar              .jar ejecutable ya compilado
+  pom.xml, src/main/java/    fuente Maven (common/, servidor/), por si lo tocas
+  diapositivas/              imágenes de la presentación
 cliente-app/
-  pom.xml
-  src/main/java/common/    misma copia de las interfaces remotas
-  src/main/java/cliente/   control remoto: GUI de solo botones
+  cliente.jar                .jar ejecutable ya compilado
+  pom.xml, src/main/java/    fuente Maven (common/, cliente/), por si lo tocas
 ```
 
-Los scripts `.command` arrancan la JVM con
-`-Djava.rmi.server.hostname=<IP-de-esa-máquina>`: es lo que hace que los
-objetos remotos (el servidor y el callback del cliente) queden anunciados
-con una IP alcanzable desde la otra máquina en vez de `localhost`, que es la
-causa más común de que RMI "funcione en una sola máquina pero no entre dos".
-No hace falta arrancar `rmiregistry` a mano: `ServidorMain` crea el
-registro con `LocateRegistry.createRegistry(1802)` al arrancar.
+`common/` (interfaces remotas: `iPresentationServer`, `iControlCallback`,
+tipos) está duplicado dentro de cada app para que cada carpeta sea
+autosuficiente.
 
-### Compilar/ejecutar a mano (sin el `.command`, opcional)
+Tanto `ServidorMain` como `ClienteMain` detectan solos la IP de la máquina
+en la red local (`common.RedUtil`) y hacen
+`System.setProperty("java.rmi.server.hostname", ip)` antes de exportar
+cualquier objeto RMI — por eso el `.jar` funciona con solo `java -jar`, sin
+flags. Sin esto, RMI anuncia sus objetos remotos con `localhost`, que es la
+causa más común de que "funcione en una sola máquina pero no entre dos". No
+hace falta arrancar `rmiregistry` a mano: `ServidorMain` crea el registro
+con `LocateRegistry.createRegistry(1802)` al arrancar.
+
+### Si modificas el código: cómo regenerar los `.jar`
+
+Requiere JDK + Maven (`brew install openjdk maven`):
 
 ```bash
 # dentro de servidor-app/
-mvn -DskipTests package
-java -Djava.rmi.server.hostname=<TU-IP> -jar target/servidor.jar diapositivas
-```
+mvn -q -DskipTests package
+cp target/servidor.jar ./servidor.jar
 
-```bash
 # dentro de cliente-app/
-mvn -DskipTests package
-java -Djava.rmi.server.hostname=<TU-IP> -jar target/cliente.jar
+mvn -q -DskipTests package
+cp target/cliente.jar ./cliente.jar
 ```
 
 ## Flujo de aceptar/rechazar una conexión
@@ -167,8 +163,8 @@ java -Djava.rmi.server.hostname=<TU-IP> -jar target/cliente.jar
   revisa que ambas máquinas estén en la misma red y que el firewall de
   macOS haya permitido a `java` aceptar conexiones en ambos lados.
 - **`NotBoundException` o "Connection refused"**: la IP que escribiste en
-  "Servidor" no es la del presentador, o el servidor no está corriendo
-  todavía. Copia exactamente la línea que imprime la terminal del servidor.
+  el diálogo del cliente no es la del presentador, o el servidor no está
+  corriendo todavía. Copia exactamente la IP de la franja amarilla.
 - **Conecta pero nunca recibe el cambio de diapositiva**: normalmente es el
   firewall bloqueando la conexión de *vuelta* del servidor hacia el
   cliente (el callback); confirma que el cliente también aceptó el aviso
