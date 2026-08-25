@@ -1,16 +1,18 @@
 # Cliente — Control remoto (esta carpeta va en la OTRA máquina)
 
 Copia esta carpeta completa (`cliente-app/`) a la máquina que va a controlar
-la presentación a distancia. No necesita nada de `servidor-app/`: ya trae su
-propia copia de `common/`.
+la presentación a distancia. No necesita nada de `servidor-app/`: es un
+proyecto Maven autosuficiente, ya trae su propia copia de `common/` (en
+`src/main/java/common/`). `mvn package` genera un `.jar` ejecutable en
+`target/cliente.jar`.
 
-## Requisito: un JDK (compilador de Java)
+## Requisito: JDK + Maven
 
-Esta máquina necesita un JDK, no solo un JRE (`java -version` no basta, hace
-falta `javac`). Si no lo tienes:
+Esta máquina necesita un JDK (no solo un JRE: hace falta `javac`) y Maven
+(`mvn`). Si te falta alguno:
 
 ```bash
-brew install openjdk
+brew install openjdk maven
 ```
 
 ## Uso
@@ -21,8 +23,8 @@ brew install openjdk
    desde la raíz del proyecto).
    - La primera vez, macOS puede avisar "no se puede verificar el
      desarrollador": clic derecho → **Abrir** → **Abrir** otra vez.
-   - El script detecta tu JDK, compila el código y abre la ventana del
-     control remoto automáticamente.
+   - El script detecta tu JDK/Maven, empaqueta el `.jar` con Maven y abre la
+     ventana del control remoto automáticamente.
 3. Apenas se abre la ventana, aparece un diálogo pidiendo la **IP del
    servidor** (la que muestra la terminal del presentador al arrancar, ej.
    `192.168.1.23`). Escríbela y pulsa **Aceptar**: el cliente arma solo la

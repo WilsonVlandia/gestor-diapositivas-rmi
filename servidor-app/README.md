@@ -1,16 +1,18 @@
 # Servidor — Presentador (esta carpeta se queda en la máquina que proyecta)
 
 Esta carpeta (`servidor-app/`) corre en la máquina conectada al proyector /
-pantalla. Es autosuficiente: trae su propia copia de `common/` y las
-imágenes en `diapositivas/`.
+pantalla. Es un proyecto Maven autosuficiente: trae su propia copia de
+`common/` (en `src/main/java/common/`), el código en
+`src/main/java/servidor/` y las imágenes en `diapositivas/`. `mvn package`
+genera un `.jar` ejecutable en `target/servidor.jar`.
 
-## Requisito: un JDK (compilador de Java)
+## Requisito: JDK + Maven
 
-Esta máquina necesita un JDK, no solo un JRE (`java -version` no basta, hace
-falta `javac`). Si no lo tienes:
+Esta máquina necesita un JDK (no solo un JRE: hace falta `javac`) y Maven
+(`mvn`). Si te falta alguno:
 
 ```bash
-brew install openjdk
+brew install openjdk maven
 ```
 
 ## Uso
@@ -25,8 +27,8 @@ brew install openjdk
    - macOS puede preguntar "¿Permitir que java acepte conexiones
      entrantes?" — pulsa **Permitir** (si no, ningún cliente podrá
      conectarse).
-   - El script detecta tu JDK y tu IP de red, compila el código y abre la
-     ventana del presentador.
+   - El script detecta tu JDK/Maven y tu IP de red, empaqueta el `.jar` con
+     Maven y abre la ventana del presentador.
 3. La terminal imprime algo como:
    ```
    IP de este servidor en la red: 192.168.1.23
@@ -71,4 +73,4 @@ Este proyecto usa RMI directo (sin servidor intermedio), así que:
   diapositiva destino) usando `ConcurrentHashMap.compute(...)`, atómico por
   clave — así se resuelve tanto el doble clic de un mismo control como la
   carrera entre dos controles pidiendo la misma acción a la vez. Ver
-  `servidor/ImpPresentationServer.java`, método `solicitarAccion`.
+  `src/main/java/servidor/ImpPresentationServer.java`, método `solicitarAccion`.

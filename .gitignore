@@ -1,4 +1,5 @@
 out/
+target/
 *.class
 .claude/
 .DS_Store

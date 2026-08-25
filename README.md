@@ -10,22 +10,24 @@ cliente-app/    se copia a la OTRA máquina, la que va a controlar la
                 presentación a distancia
 ```
 
-Cada carpeta es un proyecto completo por sí mismo (trae su propia copia de
-`common/`, las interfaces remotas compartidas), así que puedes copiar
-`cliente-app/` a otra máquina sin llevarte nada de `servidor-app/`, y
-viceversa.
+Cada carpeta es un proyecto **Maven** completo por sí mismo (trae su propia
+copia de `common/`, las interfaces remotas compartidas), así que puedes
+copiar `cliente-app/` a otra máquina sin llevarte nada de `servidor-app/`, y
+viceversa. Cada uno empaqueta un `.jar` ejecutable (`target/servidor.jar` /
+`target/cliente.jar`) con el `Main-Class` ya puesto en el manifest.
 
-## Requisito en AMBAS máquinas: un JDK (compilador), no solo un JRE
+## Requisito en AMBAS máquinas: JDK + Maven
 
-Cada máquina compila su propio código al arrancar, así que necesita
-`javac`, no solo `java`. Si `javac -version` falla en una terminal:
+Cada máquina compila y empaqueta su propio código al arrancar, así que
+necesita un JDK (no solo un JRE: hace falta `javac`) y Maven (`mvn`). Si
+faltan:
 
 ```bash
-brew install openjdk
+brew install openjdk maven
 ```
 
-(los scripts de abajo también detectan automáticamente un OpenJDK instalado
-por Homebrew aunque no esté en el `PATH`).
+(los scripts de abajo también detectan automáticamente un OpenJDK/Maven
+instalados por Homebrew aunque no estén en el `PATH`).
 
 ## Puesta en marcha rápida
 
@@ -82,12 +84,15 @@ Sigue el patrón de conexión RMI estándar (`iRMI` / `ImpRMI` /
 `Naming.rebind` / `LocateRegistry.createRegistry`):
 
 ```
-common/     interfaces remotas compartidas (iPresentationServer, iControlCallback, tipos)
-            — duplicada dentro de servidor-app/ y cliente-app/
-servidor/   (dentro de servidor-app/) presentador: ventana de diapositivas,
-            log, panel de controles conectados
-cliente/    (dentro de cliente-app/) control remoto: GUI de solo botones
-diapositivas/  (dentro de servidor-app/) imágenes de la presentación
+servidor-app/
+  pom.xml
+  src/main/java/common/    interfaces remotas compartidas (duplicadas en cliente-app/)
+  src/main/java/servidor/  presentador: ventana de diapositivas, log, panel de conexiones
+  diapositivas/             imágenes de la presentación
+cliente-app/
+  pom.xml
+  src/main/java/common/    misma copia de las interfaces remotas
+  src/main/java/cliente/   control remoto: GUI de solo botones
 ```
 
 Los scripts `.command` arrancan la JVM con
@@ -102,18 +107,14 @@ registro con `LocateRegistry.createRegistry(1802)` al arrancar.
 
 ```bash
 # dentro de servidor-app/
-JDK="$(brew --prefix openjdk)"
-mkdir -p out
-"$JDK/bin/javac" -d out $(find common servidor -name "*.java")
-"$JDK/bin/java" -Djava.rmi.server.hostname=<TU-IP> -cp out servidor.ServidorMain diapositivas
+mvn -DskipTests package
+java -Djava.rmi.server.hostname=<TU-IP> -jar target/servidor.jar diapositivas
 ```
 
 ```bash
 # dentro de cliente-app/
-JDK="$(brew --prefix openjdk)"
-mkdir -p out
-"$JDK/bin/javac" -d out $(find common cliente -name "*.java")
-"$JDK/bin/java" -Djava.rmi.server.hostname=<TU-IP> -cp out cliente.ClienteMain
+mvn -DskipTests package
+java -Djava.rmi.server.hostname=<TU-IP> -jar target/cliente.jar
 ```
 
 ## Flujo de aceptar/rechazar una conexión
@@ -134,7 +135,7 @@ mkdir -p out
 1. Al pulsar **Adelante** en el cliente, el servidor:
    - valida la sesión (token) del control,
    - aplica la ventana de idempotencia de 1 segundo (ver
-     `servidor-app/servidor/ImpPresentationServer.java`, método
+     `servidor-app/src/main/java/servidor/ImpPresentationServer.java`, método
      `solicitarAccion`, bloques `VALIDACION DE PERMISO` y
      `VENTANA DE IDEMPOTENCIA (1s)`),
    - avanza la diapositiva, actualiza la ventana del presentador y notifica
