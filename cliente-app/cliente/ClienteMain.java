@@ -8,7 +8,7 @@ public class ClienteMain {
         SwingUtilities.invokeLater(() -> {
             ClienteFrame frame = new ClienteFrame();
             frame.setVisible(true);
-            frame.conectar();
+            frame.pedirIpServidorYConectar();
         });
     }
 }

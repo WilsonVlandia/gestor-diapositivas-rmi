@@ -89,6 +89,32 @@ public class ClienteFrame extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    /**
+     * Pide la IP del servidor con un dialogo al arrancar y, si el usuario la
+     * da, la carga en el campo "Servidor" y solicita la conexion de una vez
+     * (sin necesidad de escribirla a mano ni pulsar Conectar). Si el usuario
+     * cancela el dialogo, la ventana queda igual que antes: el campo con el
+     * valor por defecto y el boton Conectar disponible para intentarlo a mano.
+     */
+    void pedirIpServidorYConectar() {
+        String ip = JOptionPane.showInputDialog(this,
+                "IP del servidor (la que muestra la terminal del presentador),\n"
+                        + "por ejemplo 192.168.1.23:",
+                "Conectar al presentador", JOptionPane.QUESTION_MESSAGE);
+        if (ip == null) {
+            return;
+        }
+        ip = ip.trim();
+        if (ip.isEmpty()) {
+            return;
+        }
+        if (!ip.contains(":")) {
+            ip = ip + ":1802/presentador";
+        }
+        campoServidor.setText(ip);
+        conectar();
+    }
+
     void conectar() {
         String nombre = campoNombre.getText().trim();
         String urlServidor = "rmi://" + campoServidor.getText().trim();

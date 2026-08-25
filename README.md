@@ -32,7 +32,8 @@ por Homebrew aunque no esté en el `PATH`).
 ### 1. Máquina del presentador (la del proyector)
 
 Deja la carpeta `servidor-app/` en esa máquina y haz doble clic en
-[`servidor-app/Iniciar-Servidor.command`](servidor-app/Iniciar-Servidor.command).
+[`servidor-app/Iniciar-Servidor.command`](servidor-app/Iniciar-Servidor.command)
+(o, desde una terminal en la raíz del repo, `make servidor`).
 Compila y arranca solo; al final imprime la IP que hay que usar desde los
 clientes. Detalle completo en [`servidor-app/README.md`](servidor-app/README.md).
 
@@ -40,9 +41,21 @@ clientes. Detalle completo en [`servidor-app/README.md`](servidor-app/README.md)
 
 Copia la carpeta `cliente-app/` a la otra máquina (USB, AirDrop, zip por
 correo/Drive...) y haz doble clic en
-[`cliente-app/Iniciar-Cliente.command`](cliente-app/Iniciar-Cliente.command).
-Compila y arranca solo; en la ventana escribe la IP que te dio el servidor
-en el campo "Servidor". Detalle completo en [`cliente-app/README.md`](cliente-app/README.md).
+[`cliente-app/Iniciar-Cliente.command`](cliente-app/Iniciar-Cliente.command)
+(o `make cliente` si tienes el repo completo en esa máquina). Apenas arranca,
+un diálogo te pide la IP del servidor (la que imprimió el paso 1); al
+aceptarla, el cliente solicita la conexión de inmediato — no hay que tocar
+ningún campo a mano. Detalle completo en [`cliente-app/README.md`](cliente-app/README.md).
+
+### Targets de `make` (opcional, si tienes el repo completo en una máquina)
+
+```bash
+make servidor   # compila y arranca servidor-app/
+make cliente    # compila y arranca cliente-app/
+```
+
+Son un atajo a los mismos `.command`; no reemplazan la necesidad de copiar
+`cliente-app/` a la otra máquina para el uso real en dos equipos.
 
 Puedes repetir el paso 2 en varias máquinas (o varias veces en la misma)
 para simular varios controles conectados a la vez.

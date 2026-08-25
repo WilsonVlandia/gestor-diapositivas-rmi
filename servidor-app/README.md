@@ -18,7 +18,8 @@ brew install openjdk
 1. Pon tus imágenes (`.png`/`.jpg`/`.jpeg`/`.gif`, se ordenan
    alfabéticamente) dentro de `diapositivas/`, reemplazando las de ejemplo
    si quieres.
-2. Haz doble clic en **`Iniciar-Servidor.command`**.
+2. Haz doble clic en **`Iniciar-Servidor.command`** (o corre `make servidor`
+   desde la raíz del proyecto).
    - La primera vez, macOS puede avisar "no se puede verificar el
      desarrollador": clic derecho → **Abrir** → **Abrir** otra vez.
    - macOS puede preguntar "¿Permitir que java acepte conexiones
@@ -31,8 +32,8 @@ brew install openjdk
    IP de este servidor en la red: 192.168.1.23
    En cada cliente, usa como 'Servidor':  192.168.1.23:1802/presentador
    ```
-   Anota esa IP: es la que se escribe en el campo "Servidor" de cada
-   cliente (ver `cliente-app/README.md`).
+   Anota esa IP: el cliente la pide en un diálogo apenas arranca (ver
+   `cliente-app/README.md`).
 4. Se abre la ventana del presentador (diapositiva actual, botones locales,
    log de actividad, panel de controles conectados).
 
