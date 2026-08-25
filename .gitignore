@@ -1,0 +1,4 @@
+out/
+*.class
+.claude/
+.DS_Store
